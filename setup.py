@@ -1,9 +1,8 @@
 from pathlib import Path
 from setuptools import setup
 
-from passsafe.version import __version__
-
 NAME = 'passsafe'
+VERSION = '0.1.0'
 
 install_requires = [
     'cryptography',
@@ -17,7 +16,7 @@ data = list(Path.cwd().joinpath(NAME).glob('*.txt'))
 
 setup(
     name=NAME,
-    version=__version__,
+    version=VERSION,
     description="A client-server app to safely handle a password in "
                 "applications.",
     author='Julien de la Bruère-Terreault',
