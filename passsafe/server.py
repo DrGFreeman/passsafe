@@ -11,6 +11,16 @@ from passsafe import MaxInvalidTokens
 MAX_MINUTES = 8 * 60
 MAX_INVALID_TOKENS = 3
 
+LOGO = r"""                               
+                               (           
+           )                 ) )\ )    (   
+ `  )   ( /(  (   (   (   ( /((()/(   ))\  
+ /(/(   )(_)) )\  )\  )\  )(_))/(_)) /((_) 
+((_)_\ ((_)_ ((_)((_)((_)((_)_(_) _|(_))   
+| '_ \)/ _` |(_-<(_-<(_-</ _` ||  _|/ -_)  
+| .__/ \__,_|/__//__//__/\__,_||_|  \___|  
+|_|                                        
+"""
 
 def ask_user_password():
     password = ''
@@ -69,11 +79,12 @@ def run():
 
     passphrase, token = safe.encrypt(ask_user_password(), minutes=minutes)
 
+    print(LOGO)
     print(f"\nYour password is stored in the safe for a period of "
           f"{minutes} minutes.")
     print("Use the passphrase and token below in the client application:\n")
-    print(f"Passphrase: {passphrase}")
-    print(f"Token:      {token[:3]} {token[3:]}\n")
+    print(f"Passphrase:\n    {passphrase}")
+    print(f"Token:\n    {token[:3]} {token[3:]}\n")
 
     app.config['safe'] = safe
     app.config['invalid_tokens'] = 0
