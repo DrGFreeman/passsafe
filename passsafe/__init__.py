@@ -1,5 +1,6 @@
 import base64
 import getpass
+from pathlib import Path
 import random
 
 from cryptography.fernet import Fernet
@@ -42,7 +43,8 @@ class Passphrase():
 
     def _load_words(self):
 
-        with open('./passsafe/wordlists/securedrop_en.txt', 'r') as word_file:
+        path = Path(__file__).parent.joinpath('wordlists', 'securedrop_en.txt')
+        with open(path, 'r') as word_file:
             lines = word_file.readlines()
             words = map(lambda x: x.replace('\n', ''), lines)
 

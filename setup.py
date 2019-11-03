@@ -1,4 +1,3 @@
-from pathlib import Path
 from setuptools import setup
 
 NAME = 'passsafe'
@@ -12,22 +11,22 @@ install_requires = [
     'waitress'
 ]
 
-data = list(Path.cwd().joinpath(NAME).glob('*.txt'))
-
 setup(
     name=NAME,
     version=VERSION,
     description="A client-server app to safely handle a password in "
-                "applications.",
+                "analytical applications.",
     author='Julien de la Bruère-Terreault',
     author_email='drgfreeman@tuta.io',
     url='https://github.com/DrGFreeman/passsafe',
     license='MIT',
     python_requires='>=3.6',
     install_requires=install_requires,
-    packages=['passsafe'],
+    packages=[NAME],
     entry_points={
-        'console_scripts': ['passsafe=passsafe.server:run']
+        'console_scripts': [f'{NAME}={NAME}.server:run']
     },
-    package_data={NAME: data},
+    package_data={
+        NAME: ['wordlists/*.txt']
+    },
 )
