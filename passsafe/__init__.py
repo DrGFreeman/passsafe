@@ -109,6 +109,9 @@ class Client():
             return self._decrypt(response.content)
         elif response.status_code == 406:
             raise InvalidToken('Invalid or expired token.')
+        elif response.status_code == 403:
+            raise MaxInvalidTokens('Maximum number of invalid tokens exceeded.')
+        
 
     def _decrypt(self, password):
 
@@ -122,3 +125,8 @@ class InvalidToken(Exception):
     """A custom exeption raised when the TOTP token is either invalid or
     expired."""
     pass
+
+
+class MaxInvalidTokens(Exception):
+    """A custom exception raised when the maximum number of invalid tokens
+    has been recieved."""

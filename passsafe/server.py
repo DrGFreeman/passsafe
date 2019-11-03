@@ -6,8 +6,10 @@ from waitress import serve
 
 from passsafe import Safe
 from passsafe import InvalidToken
+from passsafe import MaxInvalidTokens
 
 MAX_MINUTES = 8 * 60
+MAX_INVALID_TOKENS = 3
 
 
 def ask_user_password():
@@ -48,10 +50,15 @@ def get_password():
     safe = app.config['safe']
 
     try:
-        password = safe.get_password(token)
-        return password, 200
+        if app.config['invalid_tokens'] >= MAX_INVALID_TOKENS:
+            return 'Maximum number of invalid tokens exceeded\n', 403
+        else:
+            password = safe.get_password(token)
+            return password, 200
+
     except InvalidToken:
-        return '', 406
+        app.config['invalid_tokens'] += 1
+        return 'Invalid or expired token\n', 406
 
 
 def run():
@@ -69,6 +76,7 @@ def run():
     print(f"Token:      {token[:3]} {token[3:]}\n")
 
     app.config['safe'] = safe
+    app.config['invalid_tokens'] = 0
 
     serve(app, host='localhost', port=8051)
 
