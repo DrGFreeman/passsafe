@@ -6,21 +6,21 @@ from waitress import serve
 
 from passsafe import Safe
 from passsafe import InvalidToken
-from passsafe import MaxInvalidTokens
 
 MAX_MINUTES = 8 * 60
 MAX_INVALID_TOKENS = 3
 
-LOGO = r"""                               
-                               (           
-           )                 ) )\ )    (   
- `  )   ( /(  (   (   (   ( /((()/(   ))\  
- /(/(   )(_)) )\  )\  )\  )(_))/(_)) /((_) 
-((_)_\ ((_)_ ((_)((_)((_)((_)_(_) _|(_))   
-| '_ \)/ _` |(_-<(_-<(_-</ _` ||  _|/ -_)  
-| .__/ \__,_|/__//__//__/\__,_||_|  \___|  
-|_|                                        
+LOGO = r"""
+                               (
+           )                 ) )\ )    (
+ `  )   ( /(  (   (   (   ( /((()/(   ))\
+ /(/(   )(_)) )\  )\  )\  )(_))/(_)) /((_)
+((_)_\ ((_)_ ((_)((_)((_)((_)_(_) _|(_))
+| '_ \)/ _` |(_-<(_-<(_-</ _` ||  _|/ -_)
+| .__/ \__,_|/__//__//__/\__,_||_|  \___|
+|_|
 """
+
 
 def ask_user_password():
     password = ''
