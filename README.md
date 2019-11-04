@@ -76,9 +76,6 @@ When it starts, the server generates a one time passphrase composed of six words
 
 The user uses the one time passphrase and TOTP token printed out by the server to instantiate the client. Each time the `password()` method of the client instance is called, the client contacts the server, providing the TOTP token. If the TOTP token is valid and not expired, the server returns the encrypted password to the client. The client generates a decryption key using the passphrase and the same password based key derivation function and decrypts the password using this key.
 
-The username, as returned by the `getpass.getuser()` function is used by both the sever and client as a salt in the password based key derivation function.
-
-
 ## Notes on security
 
 The security of this application is based on the following principles:
