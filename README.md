@@ -1,5 +1,5 @@
 # passsafe
-A client-server app to safely handle a password in analytical applications
+A client-server app to safely handle a password in analytical applications.
 
 ## Installation
 
@@ -9,7 +9,7 @@ $ pip install git+https://github.com/DrGFreeman/passsafe.git
 
 ## Usage
 
-**passsafe** uses a client-server model to store and access the user password (or other secret). The user first launches the server in a terminal, choses the duration for which the password will be available and provides the password to be stored. The server prints out a one time passphrase and token which the user then uses in the client application to retrive the encrypted password from the server and decrypt it.
+**passsafe** uses a client-server model to store and access the user password (or other secret). The user first launches the server in a terminal, choses the duration for which the password will be available and provides the password to be stored. The server prints out a one time passphrase and token which the user then uses in the client application to retreive the encrypted password from the server and decrypt it.
 
 ### Server
 
@@ -82,7 +82,7 @@ The username, as returned by the `getpass.getuser()` function is used by both th
 ## Notes on security
 
 The security of this application is based on the following principles:
-1. The encrypted password cannot [practically](https://www.rempe.us/diceware/#diceware) be decrypted without knowledge of the one time passphrase.
+1. Decryption of the password without knowledge of the one time passphrase is [intractable](https://www.rempe.us/diceware/#diceware).
 1. The server makes the encrypted password available only for a limited time.
 1. The TOTP token is required to retrieve the encrypted password from the server.
 1. The client does not store the encrypted password but gets it from the server each time it is needed.
@@ -93,4 +93,4 @@ Protecting the one time passphrase and token is the main way to ensure the passw
 1. The sever will stop returning the encrypted password after three invalid TOTP tokens have been provided. This prevents an attacker from brute-forcing the server to find the TOTP token and get access to the encrypted password.
 2. The username, as returned by the `getpass.getuser()` function is used by both the sever and client as a salt in the password based key derivation function. This means only the user who launched the server can decrypt the password using the client application code. Although a serious attacker with access to the application source code could easily get around this feature, it prevents a "casual" user who got access to the passphrase and token to easily decrypt the encrypted password using the unmodified client application code.
 
-While this application does not provide absolute security against a serious attacker, it offers a practical means of providing a password to an application while making it relatively difficult to access the password. Compared to manipulating a password directly in code or storing it on disk or in an interactive notebook, the time bound nature of the application significantly reduces the risks associated with an inadvertent leakage of the password.
+While this application does not provide absolute security against a serious attacker, it offers a practical means of providing a password to an application while making it relatively difficult to access the password. Compared to manipulating a password directly in code or storing it on disk or in an interactive notebook, the ephemeral nature of passphrase and token significantly reduces the risks associated with an inadvertent leakage of the password.
