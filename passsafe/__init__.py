@@ -12,6 +12,8 @@ import requests
 
 from .version import __version__  # noqa F401
 
+PASSPHRASE_N_WORDS = 6
+
 # Use random.SystemRandom instead of random
 sys_random = random.SystemRandom()
 
@@ -75,7 +77,7 @@ class Safe():
         token = self._totp.now()
 
         # Generate passphrase and derive key from passphrase
-        passphrase = Passphrase().generate(5)
+        passphrase = Passphrase().generate(PASSPHRASE_N_WORDS)
         key = _generate_key(passphrase)
 
         # Encrypt password using key
