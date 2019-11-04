@@ -7,7 +7,8 @@ from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from pyotp import TOTP, random_base32
+from pyotp import TOTP
+from pyotp import random_base32
 import requests
 
 from .version import __version__  # noqa F401
@@ -19,8 +20,18 @@ sys_random = random.SystemRandom()
 
 
 def _generate_key(passphrase):
-    """Generates a key from a passphrase using a password based key derivation
-    function"""
+    """Generates a encryption/decryption key from a passphrase using a
+    password based key derivation function (PBKDF).
+    
+    Parameters
+    ----------
+    passphrase : str
+        The passprhrase from which to derive the key.
+        
+    Returns
+    -------
+    key : bytes
+        The derived key."""
 
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256,
@@ -37,7 +48,8 @@ def _generate_key(passphrase):
 
 class Passphrase():
     """Class used to generate cryptographically secure passphrases.
-    The class uses the english word list from Secure Drop."""
+    The class uses the english word list from Securedrop
+    (https://github.com/freedomofpress/securedrop#wordlists)."""
 
     def __init__(self):
 
@@ -53,6 +65,21 @@ class Passphrase():
         return words
 
     def generate(self, n, separator=' '):
+        """Generates a random passphrase using words from a list.
+
+        Parameters
+        ----------
+        n : int
+            The number of words in the passphrase.
+
+        separator : str, optional, default=' '
+            The character(s) separating the words of the passphrase.
+
+        Returns
+        -------
+        passphrase : str
+            The generated passphrase.
+        """
 
         return separator.join(sys_random.sample(self.words, n))
 
@@ -67,8 +94,27 @@ class Safe():
         pass
 
     def encrypt(self, password, minutes):
+        """Encrypts the user password.
 
-        self._window = 60 * minutes
+        Parameters
+        ----------
+        password : str
+            The password to encrypt
+
+        minutes : int
+            The validity period, in minutes, of the TOTP token used to
+            retreive the encrypted password.
+
+        Returns
+        -------
+        passphrase : str
+            The passhprase used to derive the encryption key.
+
+        token : str
+            The TOTP token required to retreive the encrypted password.
+        """
+
+        self._window = 60 * int(minutes)
 
         # Generate TOTP source
         self._totp = TOTP(random_base32(), interval=1)
@@ -87,6 +133,23 @@ class Safe():
         return passphrase, token
 
     def get_password(self, token):
+        """Returns the encrypted password, provided a valid TOTP token.
+
+        Parameters
+        ----------
+        token : str
+            The TOTP token required to retreive the encrypted password.
+
+        Returns
+        -------
+        password : str
+            The encrypted password.
+
+        Raises
+        ------
+        InvalidToken
+            If the provided TOTP token is invalid or expired.
+        """
 
         token = token.replace(' ', '')
 
@@ -97,6 +160,20 @@ class Safe():
 
 
 class Client():
+    """Retreives the password from the server and decrypts it.
+
+    Parameters
+    ----------
+    passphrase : str
+        The passphrase use to derive the password decryption key.
+
+    token : str
+        The TOTP token required to retreive the encrypted password from the
+        server.
+
+    host : str, optional, default=http://localhost:8051
+        The server host URL including the port number.
+    """
 
     def __init__(self, passphrase, token, host='http://localhost:8051'):
         self._passphrase = passphrase.strip()
@@ -104,6 +181,23 @@ class Client():
         self._host = host
 
     def password(self):
+        """Retreives the encrypted password from the server, decrypts is and
+        returns it in plain text.
+
+        Returns
+        -------
+        password : str
+            The decrypted password in plain text.
+
+        Raises
+        ------
+        InvalidToken
+            If the TOTP token is invalid or expired (http status code 406).
+
+        MaxInvalidTokens
+            If the maximum number of invalid tokens has been exceeded (http
+            status code 403).
+        """
 
         response = requests.post(f"{self._host}/?token={self._token}")
 
@@ -112,8 +206,8 @@ class Client():
         elif response.status_code == 406:
             raise InvalidToken('Invalid or expired token.')
         elif response.status_code == 403:
-            raise MaxInvalidTokens('Maximum number of invalid tokens exceeded.')
-        
+            raise MaxInvalidTokens(
+                'Maximum number of invalid tokens exceeded.')
 
     def _decrypt(self, password):
 
@@ -125,10 +219,10 @@ class Client():
 
 class InvalidToken(Exception):
     """A custom exeption raised when the TOTP token is either invalid or
-    expired."""
+    expired (http status code 406)."""
     pass
 
 
 class MaxInvalidTokens(Exception):
     """A custom exception raised when the maximum number of invalid tokens
-    has been recieved."""
+    has been recieved (http status code 403)."""
