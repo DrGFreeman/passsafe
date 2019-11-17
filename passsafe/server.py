@@ -1,4 +1,6 @@
 from getpass import getpass
+from threading import Thread
+import time
 
 from flask import Flask
 from flask import request
@@ -71,6 +73,11 @@ def get_password():
         return 'Invalid or expired token\n', 406
 
 
+def serve_app(app):
+
+    serve(app, host='localhost', port=8051)
+
+
 def run():
 
     minutes = ask_user_minutes()
@@ -89,7 +96,12 @@ def run():
     app.config['safe'] = safe
     app.config['invalid_tokens'] = 0
 
-    serve(app, host='localhost', port=8051)
+    t = Thread(target=serve_app, args=[app], daemon=True)
+    t.start()
+
+    time.sleep(minutes * 60)
+
+    print(f"\nPassword storage duration has expired. Shutting down the safe.")
 
 
 if __name__ == '__main__':
