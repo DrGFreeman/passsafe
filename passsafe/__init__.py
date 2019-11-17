@@ -22,12 +22,12 @@ sys_random = random.SystemRandom()
 def _generate_key(passphrase):
     """Generates a encryption/decryption key from a passphrase using a
     password based key derivation function (PBKDF).
-    
+
     Parameters
     ----------
     passphrase : str
         The passprhrase from which to derive the key.
-        
+
     Returns
     -------
     key : bytes
